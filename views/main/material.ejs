@@ -1,0 +1,150 @@
+<%- include ../partials/head.ejs %>
+<script src="/js/m-different-branch.js"></script>
+<% const MONTH = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]; %>
+<style>
+  *::-webkit-scrollbar-track{
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    background-color: #F5F5F5;
+  }
+
+  *::-webkit-scrollbar{
+    width: 10px;
+    background-color: #F5F5F5;
+  }
+
+  *::-webkit-scrollbar-thumb{
+    background-color: #000000;
+    border: 2px solid #555555;
+  }
+
+  meter {
+    background: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ctext font-size="100" y="0.9em" stroke-linejoin="round" fill="white" stroke="darkorange" stroke-width="4"%3E★%3C/text%3E%3C/svg%3E') 0/auto 100%;
+    height: 1.6rem;
+    width: 8rem;
+  }
+
+  meter::-webkit-meter-bar {
+    background: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ctext font-size="100" y="0.9em" stroke-linejoin="round" fill="white" stroke="darkorange" stroke-width="4"%3E★%3C/text%3E%3C/svg%3E') 0/auto 100%;
+  }
+
+  /* firefox styling for the bar (filled stars) */
+  meter:-moz-meter-optimum::-moz-meter-bar,
+  meter:-moz-meter-sub-optimum::-moz-meter-bar,
+  meter:-moz-meter-sub-sub-optimum::-moz-meter-bar {
+    background: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ctext font-size="100" y="0.9em" stroke-linejoin="round" fill="gold" stroke="darkorange" stroke-width="4"%3E★%3C/text%3E%3C/svg%3E') 0/auto 100%;
+  }
+
+  /* webkit styling for the bar (filled stars) */
+  meter::-webkit-meter-optimum-value,
+  meter::-webkit-meter-suboptimum-value,
+  meter::-webkit-meter-even-less-good-value {
+    background: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ctext font-size="100" y="0.9em" stroke-linejoin="round" fill="gold" stroke="darkorange" stroke-width="4"%3E★%3C/text%3E%3C/svg%3E') 0/auto 100%;
+  }
+</style>
+
+<%- include ../partials/header.ejs %>      
+  <main>
+    <style>
+      
+      .pdfimage{
+        width: 100%;
+      }
+      .page-no{
+        margin-bottom: 0px;
+      }
+      .page{
+        position: relative;
+      }
+      .page .watermark{
+        font-size: 8rem;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        opacity: 0.1;
+      }
+      .material-display{
+        /* border-top: 2px solid black; */
+      }
+
+      /* different materials styling */
+      .course-details{
+      list-style-type: none;
+      padding: 0px;
+      }
+      .general-form{
+        margin: auto;
+        background-color: rgb(248, 251, 253);
+        box-shadow: 10px 10px 5px rgb(231, 234, 236);
+        padding: 20px;
+        border-radius: 2%;
+      }
+      .course-description{
+        margin: 2.3em auto;
+        cursor: pointer;
+        min-height: 160px;
+      }
+    </style>
+    <div class="container">
+      <div class="jumbotron p-3" style="background-image: linear-gradient(#9068be, #e1e8f0);">
+        <h1 class="material-title text-light"><%= material.subject.title %></h1>
+        <div class="row">
+          <div class="col-md-4">
+            <h5 class="material-publisher"><strong>By:</strong> <%= material.publisher.name.first + ' ' + material.publisher.name.last %></h5>
+          </div>
+          <div class="col-md-4">
+            <meter value="5" min="0" max="5"></meter><span>(0)</span>
+          </div>
+          <div class="col-md-4">
+            <h5 class="material-uploaded-on"><strong>Uploaded on:</strong> <%= MONTH[material.createdAt.getMonth()] %>,<%= material.createdAt.getYear() + 1900 %></h5>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-3">
+          <h1>Contents: </h1>
+          <div class="contents" style="overflow-y: scroll; margin-left: 0px; padding: 0px;">
+              <div id="list-example" class="list-group" style="max-height: 75vh;">
+                <% material.contents.forEach((c, i, arr) => { %>
+                  <a class="list-group-item list-group-item-action" href="#list-item-<%= c.chapterNo %>">Unit-<%= c.chapterNo %>: <strong><%= c.chapterName %></strong> : <%= c.start %>-<% if(arr.length-1 !== i){ %><%= arr[i+1].start -1  %><% }else{ %><%= material.totalPages %><%}%></a>
+                <% }); %>                                       
+              </div>
+            </div>
+        </div>
+        <div class="mt-4 col-lg-9 material-display">
+          <div data-spy="scroll" data-target="#list-example" data-offset="50" class="images-container scrollspy-example" id="lazy-container" style="max-height: 100vh; overflow-y: scroll;background-color: #e1e8f0;">
+            <% for(let p = 1; p <= material.totalPages; p++){ %>
+              <% material.contents.forEach(c => { %>
+                <% if(c.start === p){ %>
+                  <h1  id="list-item-<%= c.chapterNo %>" class="page-no text-center">Unit-<%= c.chapterNo %>: <%= c.chapterName %></h1><hr/>  
+                <% } %>
+              <% }) %>
+              <p class="page-no text-center"><strong>Page No : <%= p %></strong></p>
+              <div class="page pr-2 pl-2">
+                <img class="lazy pdfimage" data-src="https://s3.ap-south-1.amazonaws.com/kitaabx.com/testImages/cn_<%= p %>.jpg"/>
+                <h1 class="watermark">kitaabx.com</h1>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+      <div id="differentMaterials">
+      </div>
+    </div>    
+  </main>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.min.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.plugins.min.js"></script>
+  <script>
+    $(function() {
+      $('#lazy-container .lazy').lazy({
+        appendScroll: $('#lazy-container')
+      });
+    });
+  </script>
+  <script>
+    $(document).ready(() => {
+      getMaterials("<%= material.subject.title %>", <%= material.subject.year %>, "<%= material.subject.branch %>");
+    })
+  </script> 
+<%- include ../partials/footer.ejs %>
